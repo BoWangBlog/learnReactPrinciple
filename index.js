@@ -4,11 +4,12 @@
  * @since 2021/1/26
  */
 import React from "./react";
+import ReactDOM from './react-dom';
 
 const ele = (
     <div className="active" title="react">
-        hell, <span>learning react</span>
+        hello, <span style={{ color: 'red' }}>learning react</span>
     </div>
 );
 
-console.log(ele);
+ReactDOM.render(ele, document.querySelector('#root'));

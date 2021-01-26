@@ -4,10 +4,13 @@
  * @since 2021/1/26
  */
 
-const React = {
-    createElement
-};
-
+/**
+ * 创建doms
+ * @param tag
+ * @param attrs
+ * @param childrens
+ * @returns {{childrens: *[], tag, attrs}}
+ */
 const createElement = (tag, attrs, ...childrens) => {
     return {
         tag,
@@ -15,5 +18,9 @@ const createElement = (tag, attrs, ...childrens) => {
         childrens
     }
 }
+
+const React = {
+    createElement
+};
 
 export default React;
