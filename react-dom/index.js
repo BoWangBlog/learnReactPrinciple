@@ -3,6 +3,87 @@
  * @author wangbo
  * @since 2021/1/26
  */
+import Component from "../react/component";
+
+/**
+ * 函数/类 组件创建
+ * @param component
+ * @param props
+ */
+const createComponent = (component, props) => {
+    // 类组件，创建实例，携带props返回
+    if (component.prototype && component.prototype.render) {
+        return new component(props);
+    }
+    // 函数组件，将函数组件扩展为类组件，便于后续统一s管理
+    const inst = new Component(props);
+    inst.constructor = component;
+    inst.render = function () {
+        return this.constructor(props);
+    }
+    return inst;
+}
+
+/**
+ * 组件渲染
+ * @param component
+ */
+const renderComponent = component => {
+    // todo undefined
+    const renderer = component.render();
+    component.basic = _render(renderer);
+}
+
+/**
+ * 设置组件属性
+ * @param component
+ * @param props
+ */
+const setComponentProps = (component, props) => {
+    component.props = props;
+    renderComponent(component);
+}
+
+/**
+ * 渲染dom节点
+ * @param vNode
+ * @returns {Text|*}
+ * @private
+ */
+const _render = vNode => {
+    if (!vNode) {
+        return;
+    }
+    // 字符串类型
+    if (typeof vNode === 'string') {
+        // 创建文本节点
+        return document.createTextNode(vNode);
+    }
+
+    // 函数
+    if (typeof vNode.tag === 'function') {
+        // 创建组件
+        const component = createComponent(vNode.tag, vNode.attrs);
+        // 设置组件属性
+        setComponentProps(component, vNode.attrs);
+        // 返回组件渲染节点对象
+        return component.basic;
+    }
+    // 虚拟dom对象
+    const { tag, attrs } = vNode;
+    // 创建dom对象
+    const dom = document.createElement(tag);
+    // 存在属性则进行设置
+    if (attrs) {
+        Object.keys(attrs).forEach(key => {
+            const value = attrs[key];
+            setAttribute(dom, key, value);
+        })
+    }
+    // 递归调用渲染子节点
+    vNode.children.forEach(child => render(child, dom));
+    return dom;
+}
 
 /**
  * 属性设置
@@ -62,34 +143,8 @@ const setAttribute = (dom, key, value) => {
  * @returns {*|ActiveX.IXMLDOMNode}
  */
 const render = (vNode, container) => {
-    if (vNode === undefined) {
-        return;
-    }
-    // 字符串类型
-    if (typeof vNode === 'string') {
-        // 创建文本节点
-        const textNode = document.createTextNode(vNode);
-        container.appendChild(textNode);
-        return container;
-    }
-
-    // 虚拟dom对象
-    const { tag, attrs } = vNode;
-    // 创建dom对象
-    const dom = document.createElement(tag);
-    // 存在属性则进行设置
-    if (attrs) {
-        Object.keys(attrs).forEach(key => {
-            const value = attrs[key];
-            setAttribute(dom, key, value);
-        })
-    }
-    // 递归调用渲染子节点
-    vNode.childrens.forEach(child => render(child, dom));
-
-    return container.appendChild(dom);
+    return container.appendChild(_render(vNode));
 };
-
 
 const ReactDOM = {
     render

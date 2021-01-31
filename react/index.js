@@ -8,14 +8,14 @@
  * 创建doms
  * @param tag
  * @param attrs
- * @param childrens
- * @returns {{childrens: *[], tag, attrs}}
+ * @param children
+ * @returns {{children: *[], tag, attrs}}
  */
-const createElement = (tag, attrs, ...childrens) => {
+const createElement = (tag, attrs, ...children) => {
     return {
         tag,
         attrs,
-        childrens
+        children
     }
 }
 
